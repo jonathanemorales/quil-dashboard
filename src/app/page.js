@@ -37,7 +37,16 @@ export default function Home() {
     }
 
     fetchPrice();
+
     fetchData(); // Call the fetch function
+
+    setInterval(() => {
+      fetchData();
+    }, 5000);
+
+    setInterval(() => {
+      fetchPrice();
+    }, 60000);
 
   }, []); // Empty dependency array means it runs only once after the component mounts
 
@@ -50,12 +59,13 @@ export default function Home() {
         <thead>
           <tr>
             <th>Miner</th>
-            <th>QUIL/Hour</th>
             <th>QUIL/Minute</th>
+            <th>QUIL/Hour</th>
             <th>QUIL/Day</th>
             <th>USD/Minute</th>
             <th>USD/Hour</th>
             <th>USD/Day</th>
+            <th>Total QUIL</th>
           </tr>
         </thead>
         <tbody>
@@ -68,6 +78,7 @@ export default function Home() {
               <td>${(miner[1].earningsPastMinute * currentQuilPrice).toFixed(2)}</td>
               <td>${(miner[1].earningsPastHour * currentQuilPrice).toFixed(2)}</td>
               <td>${(miner[1].earningsPastDay * currentQuilPrice).toFixed(2)}</td>
+              <th>{miner[1].lastBalance.toFixed(0)}</th>
             </tr>
           ))}
         </tbody>
