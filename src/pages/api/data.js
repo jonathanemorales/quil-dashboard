@@ -27,9 +27,10 @@ export default async function handler(req, res) {
 
             // Initialize an object to store summarized data for each peer_id
             const summary = {};
+            const lastEntryByPeerId = {}; // Store the last entry for each peer_id
 
             // Iterate over the miner data to calculate earnings by peer_id
-            minersData.forEach((entry, index) => {
+            minersData.forEach((entry) => {
                 const { peer_id, balance, timestamp } = entry;
                 const entryTime = new Date(timestamp);
                 const currentBalance = parseFloat(balance);
@@ -44,23 +45,30 @@ export default async function handler(req, res) {
                     };
                 }
 
-                // For subsequent entries of the same peer_id, calculate the balance change
-                if (index > 0 && minersData[index - 1].peer_id === peer_id) {
-                    const previousEntry = minersData[index - 1];
-                    const previousBalance = parseFloat(previousEntry.balance);
-                    const balanceChange = currentBalance - previousBalance;
-
-                    // Check if the timestamp is within the last minute, hour, or day
-                    if (entryTime >= oneMinuteAgo) {
-                        summary[peer_id].earningsPastMinute += balanceChange;
-                    }
-                    if (entryTime >= oneHourAgo) {
-                        summary[peer_id].earningsPastHour += balanceChange;
-                    }
-                    if (entryTime >= oneDayAgo) {
-                        summary[peer_id].earningsPastDay += balanceChange;
-                    }
+                // Check if the last entry for this peer_id exists, otherwise set it to the current entry
+                if (!lastEntryByPeerId[peer_id]) {
+                    lastEntryByPeerId[peer_id] = entry;
                 }
+
+                const previousEntry = lastEntryByPeerId[peer_id];
+                const previousBalance = parseFloat(previousEntry.balance);
+
+                // Calculate the balance change for this entry compared to the previous one
+                const balanceChange = currentBalance - previousBalance;
+
+                // Check if the timestamp is within the last minute, hour, or day
+                if (entryTime >= oneMinuteAgo) {
+                    summary[peer_id].earningsPastMinute += balanceChange;
+                }
+                if (entryTime >= oneHourAgo) {
+                    summary[peer_id].earningsPastHour += balanceChange;
+                }
+                if (entryTime >= oneDayAgo) {
+                    summary[peer_id].earningsPastDay += balanceChange;
+                }
+
+                // Update the last entry for this peer_id with the current entry
+                lastEntryByPeerId[peer_id] = entry;
 
                 // Update the last balance for the peer_id in the summary object
                 summary[peer_id].lastBalance = currentBalance;
