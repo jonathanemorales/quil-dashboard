@@ -1,41 +1,51 @@
-import React from 'react';
+"use client"
+import React, { useState } from 'react';
 import styles from '../styles/Home.module.css'; // For styling
+import { useEffect } from 'react';
 
 export default function Home() {
-  const minersData = [
-    {
-      miner: 'Miner 1',
-      quilPerHour: 50,
-      quilPerMinute: 0.83,
-      quilPerDay: 1200,
-      usdPerHour: 10,
-      usdPerMinute: 0.17,
-      usdPerDay: 240
-    },
-    {
-      miner: 'Miner 2',
-      quilPerHour: 60,
-      quilPerMinute: 1,
-      quilPerDay: 1440,
-      usdPerHour: 12,
-      usdPerMinute: 0.20,
-      usdPerDay: 288
-    },
-    {
-      miner: 'Miner 3',
-      quilPerHour: 45,
-      quilPerMinute: 0.75,
-      quilPerDay: 1080,
-      usdPerHour: 9,
-      usdPerMinute: 0.15,
-      usdPerDay: 216
-    },
-  ];
+  const [minersData, setMinerData] = useState([]);
+  const [currentQuilPrice, setCurrentQuilPrice] = useState(0);
+
+  useEffect(() => {
+    // Define an async function to fetch the data
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/data'); // Fetch data from your API endpoint
+        const data = await response.json(); // Parse the JSON data
+        setMinerData(Object.entries(data)); // Set the data to the state
+      } catch (error) {
+        console.error('Error fetching miner data:', error); // Handle any errors
+      }
+    };
+
+    async function fetchPrice() {
+      const url = "https://api.coingecko.com/api/v3/simple/price";
+      const params = new URLSearchParams({
+        ids: 'wrapped-quil',
+        vs_currencies: 'usd'
+      });
+
+      try {
+        const response = await fetch(`${url}?${params}`);
+        const data = await response.json();
+        setCurrentQuilPrice(data['wrapped-quil']?.usd || minersData)
+      } catch (error) {
+        console.error('Error fetching wQUIL price:', error);
+        return 0; // Return 0 in case of an error
+      }
+    }
+
+    fetchPrice();
+    fetchData(); // Call the fetch function
+
+  }, []); // Empty dependency array means it runs only once after the component mounts
+
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Quilibrium Miners</h1>
-
+      <h2>Current Quil Price: ${currentQuilPrice}</h2>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -43,21 +53,21 @@ export default function Home() {
             <th>QUIL/Hour</th>
             <th>QUIL/Minute</th>
             <th>QUIL/Day</th>
-            <th>USD/Hour</th>
             <th>USD/Minute</th>
+            <th>USD/Hour</th>
             <th>USD/Day</th>
           </tr>
         </thead>
         <tbody>
-          {minersData.map((miner, index) => (
+          {minersData?.map((miner, index) => (
             <tr key={index}>
-              <td>{miner.miner}</td>
-              <td>{miner.quilPerHour}</td>
-              <td>{miner.quilPerMinute}</td>
-              <td>{miner.quilPerDay}</td>
-              <td>${miner.usdPerHour}</td>
-              <td>${miner.usdPerMinute}</td>
-              <td>${miner.usdPerDay}</td>
+              <td>{miner[0]}</td>
+              <td>{miner[1].earningsPastMinute.toFixed(4)}</td>
+              <td>{miner[1].earningsPastHour.toFixed(4)}</td>
+              <td>{miner[1].earningsPastDay.toFixed(4)}</td>
+              <td>${(miner[1].earningsPastMinute * currentQuilPrice).toFixed(2)}</td>
+              <td>${(miner[1].earningsPastHour * currentQuilPrice).toFixed(2)}</td>
+              <td>${(miner[1].earningsPastDay * currentQuilPrice).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

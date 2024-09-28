@@ -6,15 +6,12 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
         try {
-            const { minersData } = req.body;
-
-            // Check if minersData exists and is an array
-            if (!minersData || !Array.isArray(minersData)) {
-                return res.status(400).json({ message: 'Invalid data format' });
-            }
-
+            let existingData = [];
+            const data = await fs.readFile(filePath, 'utf-8');
+            existingData = JSON.parse(data);
+            existingData.push(req.body)
             // Store the received data into minersData.json file
-            await fs.writeFile(filePath, JSON.stringify(minersData, null, 2), 'utf-8');
+            await fs.writeFile(filePath, JSON.stringify(existingData, null, 2), 'utf-8');
 
             return res.status(200).json({ message: 'Data saved successfully' });
         } catch (error) {
