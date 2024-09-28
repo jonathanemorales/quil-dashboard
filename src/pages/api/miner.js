@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { addData, getMinersDataCache } from '../../cache';
 
 export default async function handler(req, res) {
     // Allow requests from any origin
@@ -11,17 +10,11 @@ export default async function handler(req, res) {
     // Allow specific headers
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    const filePath = path.join(process.cwd(), 'src', 'data', 'minersData.json');
-
     if (req.method === 'POST') {
         try {
-            let existingData = [];
-            const data = await fs.readFile(filePath, 'utf-8');
-            existingData = JSON.parse(data);
-            existingData.push(req.body)
-            // Store the received data into minersData.json file
-            await fs.writeFile(filePath, JSON.stringify(existingData, null, 2), 'utf-8');
-
+            if(req.body.balance){
+                addData(req.body);
+            }
             return res.status(200).json({ message: 'Data saved successfully' });
         } catch (error) {
             return res.status(500).json({ message: 'Failed to save data', error });
@@ -29,10 +22,9 @@ export default async function handler(req, res) {
     } else if (req.method === 'GET') {
         try {
             // Read and return the data from minersData.json
-            const data = await fs.readFile(filePath, 'utf-8');
-            const minersData = JSON.parse(data);
+            const data = getMinersDataCache();
 
-            return res.status(200).json(minersData);
+            return res.status(200).json(data);
         } catch (error) {
             return res.status(500).json({ message: 'Failed to retrieve data', error });
         }

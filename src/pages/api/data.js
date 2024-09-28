@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { getMinersDataCache } from '@/cache';
 
 export default async function handler(req, res) {
     // Allow requests from any origin
@@ -11,13 +10,10 @@ export default async function handler(req, res) {
     // Allow specific headers
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    const filePath = path.join(process.cwd(), 'src', 'data', 'minersData.json');
-
     if (req.method === 'GET') {
         try {
             // Read the miner data from the JSON file
-            const data = await fs.readFile(filePath, 'utf-8');
-            const minersData = JSON.parse(data);
+            const minersData = getMinersDataCache();
 
             // Get the current time
             const now = new Date();
