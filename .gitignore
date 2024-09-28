@@ -13,6 +13,8 @@
 /.next/
 /out/
 
+src/data/minersData.json
+
 # production
 /build
 
