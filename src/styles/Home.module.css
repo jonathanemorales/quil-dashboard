@@ -1,0 +1,73 @@
+/* styles/Home.module.css */
+
+.container {
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    transition: background-color 0.3s ease;
+}
+
+.table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.table tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+.table tr:nth-child(odd) td {
+    background-color: #ffffff;
+}
+
+.table tr:hover td {
+    background-color: #d3e9d7;
+}
+
+.table td {
+    text-align: center;
+    color: #333;
+    border-right: 1px solid #ddd;
+}
+
+.table th {
+    text-align: center;
+    font-size: 1.2rem;
+    border-right: 1px solid #fff;
+}
+
+/* Add better visibility to even columns */
+.table td:nth-child(even),
+.table th:nth-child(even) {
+    background-color: #e8f5e9;
+    /* Soft green for visibility */
+    color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    .table th,
+    .table td {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}
