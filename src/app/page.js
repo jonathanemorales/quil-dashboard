@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 export default function Home() {
   const [minersData, setMinerData] = useState([]);
@@ -48,6 +48,46 @@ export default function Home() {
     };
   }, []); // Empty dependency array means it runs only once after the component mounts
 
+  const handleLabelUpdate = useCallback((event) => {
+    const col = event.currentTarget;
+    const peerId = col.getAttribute('data-peer-id');
+    const label = prompt(`Add a label for miner ${peerId}:`, "");
+    if (label) {
+      // Save the label to localStorage
+      localStorage.setItem(peerId, label);
+      // Update the label on the page
+      const labelSpan = col.querySelector('.label');
+      labelSpan.textContent = `${label}`;
+    }
+  }, []);
+
+  useEffect(() => {
+    // Load labels from localStorage when the component is mounted
+    minersData.forEach((miner) => {
+      const storedLabel = localStorage.getItem(miner[0]);
+      if (storedLabel) {
+        const minerElement = document.querySelector(`[data-peer-id="${miner[0]}"]`);
+        if (minerElement) {
+          const labelSpan = minerElement.querySelector('.label');
+          labelSpan.textContent = `${storedLabel}`;
+        }
+      }
+    });
+
+    // Select all miner name columns and add the click event listener
+    const minerColumns = document.querySelectorAll('.miner-name');
+    minerColumns.forEach((col) => {
+      col.addEventListener('click', handleLabelUpdate);
+    });
+
+    // Cleanup function: Remove event listeners on unmount
+    return () => {
+      minerColumns.forEach((col) => {
+        col.removeEventListener('click', handleLabelUpdate);
+      });
+    };
+  }, [minersData, handleLabelUpdate]);
+
   return (
     <div className="container">
       <h1 className="title">Quilibrium Miners</h1>
@@ -69,7 +109,9 @@ export default function Home() {
           <tbody>
             {minersData?.map((miner, index) => (
               <tr key={index}>
-                <td>{miner[0]}</td>
+                <td className="miner-name" data-peer-id={miner[0]}>
+                  <span className="label"></span>
+                </td>
                 <td>{miner[1]?.earningsPastMinute?.toFixed(4)}</td>
                 <td>{miner[1]?.earningsPastHour?.toFixed(4)}</td>
                 <td>{miner[1]?.earningsPastDay?.toFixed(4)}</td>

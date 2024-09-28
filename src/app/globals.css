@@ -33,6 +33,10 @@ body {
   align-items: center;
 }
 
+.miner-name:hover {
+  cursor: pointer;
+}
+
 /* Title Styling */
 .title {
   font-size: 2rem;
