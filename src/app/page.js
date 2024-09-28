@@ -65,11 +65,14 @@ export default function Home() {
     // Load labels from localStorage when the component is mounted
     minersData.forEach((miner) => {
       const storedLabel = localStorage.getItem(miner[0]);
-      if (storedLabel) {
-        const minerElement = document.querySelector(`[data-peer-id="${miner[0]}"]`);
-        if (minerElement) {
-          const labelSpan = minerElement.querySelector('.label');
+      const minerElement = document.querySelector(`[data-peer-id="${miner[0]}"]`);
+      if (minerElement) {
+        const labelSpan = minerElement.querySelector('.label');
+
+        if (storedLabel) {
           labelSpan.textContent = `${storedLabel}`;
+        } else {
+          labelSpan.textContent = `${miner[0]}`;
         }
       }
     });
