@@ -2,6 +2,15 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export default async function handler(req, res) {
+    // Allow requests from any origin
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Allow specific HTTP methods
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+
+    // Allow specific headers
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     const filePath = path.join(process.cwd(), 'src', 'data', 'minersData.json');
 
     if (req.method === 'GET') {
