@@ -23,8 +23,6 @@ export default async function handler(req, res) {
 
             // Initialize an object to store summarized data for each peer_id
             const summary = {};
-            const lastEntryByPeerId = {}; // Store the last entry for each peer_id
-
             const uniquePeerIds = [...new Set(minersData.map(item => item.peer_id))];
 
             uniquePeerIds.forEach(peerId => {
@@ -35,7 +33,7 @@ export default async function handler(req, res) {
                 const balanceChangeMinute = lastMinuteEntries.length > 0 ? parseFloat(lastMinuteEntries[lastMinuteEntries.length - 1].balance - lastMinuteEntries[0].balance) : 0;
 
                 //Minute
-                const lastHourlyntries = allEntries.filter(x => x.peer_id === peerId && new Date(x.timestamp) >= oneMinuteAgo);
+                const lastHourlyntries = allEntries.filter(x => x.peer_id === peerId && new Date(x.timestamp) >= oneHourAgo);
                 const balanceChangeHourly = lastHourlyntries.length > 0 ? parseFloat(lastHourlyntries[lastHourlyntries.length - 1].balance - lastHourlyntries[0].balance) : 0;
 
                 //Daily
