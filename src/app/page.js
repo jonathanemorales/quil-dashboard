@@ -1,9 +1,15 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
 
 export default function Home() {
   const [minersData, setMinerData] = useState([]);
   const [currentQuilPrice, setCurrentQuilPrice] = useState(0);
+  const [hourlyData, setHourlyData] = useState([]);
 
   useEffect(() => {
     // Define an async function to fetch the data
@@ -17,6 +23,12 @@ export default function Home() {
       }
     };
 
+    // Fetch the hourly growth data from the API
+    async function fetchHourlyData() {
+      const response = await fetch('/api/hourly-growth');
+      const data = await response.json();
+      setHourlyData(data);
+    }
     const fetchPrice = async () => {
       const url = "https://api.coingecko.com/api/v3/simple/price";
       const params = new URLSearchParams({
@@ -36,6 +48,7 @@ export default function Home() {
     // Initial data fetch
     fetchPrice();
     fetchData();
+    fetchHourlyData();
 
     // Set intervals for recurring fetches
     const dataInterval = setInterval(fetchData, 5000); // Fetch every 5 seconds
@@ -91,10 +104,75 @@ export default function Home() {
     };
   }, [minersData, handleLabelUpdate]);
 
+    // Group data by peer_id
+    const groupedData = hourlyData.reduce((acc, entry) => {
+      const peerId = entry.peer_id;
+      if (!acc[peerId]) {
+        acc[peerId] = [];
+      }
+      acc[peerId].push(entry);
+      return acc;
+    }, {});
+  
+    // Prepare datasets for each peer_id
+    const datasets = Object.keys(groupedData).map(peerId => {
+      return {
+        label: `Peer ID: ${peerId}`,
+        data: groupedData[peerId].map(entry => entry.balanceGrowth),
+        borderColor: getRandomColor(), // You can generate random colors for each peer_id
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        tension: 0.2,
+      };
+    });
+  
+    // Prepare chart data with labels (time) and datasets
+    const chartData = {
+      labels: hourlyData.map(entry => new Date(entry.time).toLocaleTimeString()), // X-axis: time (hours)
+      datasets: datasets, // Y-axis: balance growth for each peer_id
+    };
+  
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Hourly Balance Growth by Peer ID',
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Time',
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Balance Growth',
+          },
+        },
+      },
+    };
+  
+    // Function to generate a random color for each dataset
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
   return (
     <div className="container">
       <h1 className="title">Quilibrium Miners</h1>
-      <h2 className="title">Current Quil Price: ${currentQuilPrice.toFixed(2)}</h2>
+      <h2 className="title">Current Quil Price: ${currentQuilPrice.toFixed(4)}</h2>
       <div className="table-wrapper">
         <table className="table">
           <thead>
@@ -136,6 +214,12 @@ export default function Home() {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div className="chartContainer">
+        <h1>Hourly Growth</h1>
+        <div className="chart">
+          <Line data={chartData} options={options} />
+        </div>
       </div>
     </div>
   );
