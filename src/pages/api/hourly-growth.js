@@ -34,11 +34,11 @@ export default async function handler(req, res) {
         }, {});
 
         // Calculate total balance growth for this hour
-        let totalBalanceGrowth = 0;
 
         // Iterate through each peer_id and calculate their balance growth
         for (const peerId in peerIdGroups) {
             const peerEntries = peerIdGroups[peerId];
+            let totalBalanceGrowth = 0;
             if (peerEntries.length > 0) {
                 const initialBalance = parseFloat(peerEntries[0].balance);
                 const finalBalance = parseFloat(peerEntries[peerEntries.length - 1].balance);
