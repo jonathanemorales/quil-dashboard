@@ -177,15 +177,3 @@ body {
 .table th:last-child {
   border-radius: 0 8px 0 0;
 }
-
-.chartContainer {
-  width: 100%;  /* Full width */
-  max-width: 100%;  /* Ensure it doesn’t exceed the parent container’s width */
-  margin: 0 auto;   /* Center it */
-  padding: 20px;    /* Add some padding for spacing */
-}
-
-.chart {
-  width: 100%;  /* Make sure the chart canvas takes full width */
-  height: 400px;
-}
