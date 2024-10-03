@@ -1,9 +1,16 @@
 "use client";
+import BarChart from "@/components/barChart";
 import React, { useState, useEffect, useCallback } from "react";
 
 export default function Home() {
   const [minersData, setMinerData] = useState([]);
   const [currentQuilPrice, setCurrentQuilPrice] = useState(0);
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    var data = mapDataForChart(minersData);
+    setChartData(data);
+  }, [minersData]);
 
   useEffect(() => {
     // Define an async function to fetch the data
@@ -12,6 +19,7 @@ export default function Home() {
         const response = await fetch("/api/data"); // Fetch data from your API endpoint
         const data = await response.json(); // Parse the JSON data
         setMinerData(Object.entries(data)); // Set the data to the state
+        setChartData(mapDataForChart(data));
       } catch (error) {
         console.error("Error fetching miner data:", error); // Handle any errors
       }
@@ -91,6 +99,17 @@ export default function Home() {
     };
   }, [minersData, handleLabelUpdate]);
 
+  // Mapping function to transform the data
+  const mapDataForChart = (data) => {
+    if (data && data.length >0) {
+      return data.map(entry => ({
+        user: entry[0],  // If `timestamp` is null or undefined, set to null
+        values: entry[1].hourly,  // If `value` is null or undefined, set to 0 or any default value you prefer
+      }));
+    }
+    return [];
+  };
+
   return (
     <div className="container">
       <h1 className="title">Quilibrium Miners</h1>
@@ -137,6 +156,9 @@ export default function Home() {
           </tbody>
         </table>
       </div>
+      {
+        chartData.length > 0 && <BarChart data={chartData} />
+      }
     </div>
   );
 }
