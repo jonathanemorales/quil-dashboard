@@ -31,7 +31,7 @@ const BarChart = ({ data }) => {
 
     const datasets = data
         ? data.map(user => ({
-            label: user.user,  // Name of the user
+            label: localStorage.getItem(user.user) || user.user,  // Name of the user
             data: user.values ? user.values.map(item => item.value) : [],  // Corresponding Y values or empty array
             backgroundColor: getRandomColor(),  // Assign a different color to each user
             borderColor: getRandomColor(),
