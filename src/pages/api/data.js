@@ -14,6 +14,7 @@ export default async function handler(req, res) {
         try {
             // Read the miner data from the JSON file
             const cachedData = getMinersDataCache();
+
             const minersData = cachedData
                 .map(entry => ({
                     ...entry,
@@ -21,30 +22,32 @@ export default async function handler(req, res) {
                 }));
 
             // Get the current time
-            const now = new Date();
-            const oneMinuteAgo = new Date(now.getTime() - 60 * 1000);
-            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-            const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const now = new Date().getTime();
+            const oneMinuteAgo = new Date(now - 60000);
+            const oneHourAgo = new Date(now - 3600000);
+            const oneDayAgo = new Date(now - 86400000);
 
             // Initialize an object to store summarized data for each peer_id
             const summary = {};
+
             const uniquePeerIds = [...new Set(minersData.map(item => item.peer_id))];
 
             uniquePeerIds.forEach(peerId => {
                 const allEntries = minersData.filter(x => x.peer_id === peerId);
+
                 const hourlyData = []
-
-                //Minute
-                const lastMinuteEntries = allEntries.filter(x => x.timestamp >= oneMinuteAgo);
-                const balanceChangeMinute = lastMinuteEntries.length > 0 ? parseFloat(lastMinuteEntries[lastMinuteEntries.length - 1].balance - lastMinuteEntries[0].balance) : 0;
-
-                //Minute
-                const lastHourlyntries = allEntries.filter(x => x.timestamp >= oneHourAgo);
-                const balanceChangeHourly = lastHourlyntries.length > 0 ? parseFloat(lastHourlyntries[lastHourlyntries.length - 1].balance - lastHourlyntries[0].balance) : 0;
 
                 //Daily
                 const lastDayEntries = allEntries.filter(x => x.timestamp >= oneDayAgo);
                 const balanceChangeDaily = lastDayEntries.length > 0 ? parseFloat(lastDayEntries[lastDayEntries.length - 1].balance - lastDayEntries[0].balance) : 0;
+
+                //Minute
+                const lastHourlyntries = lastDayEntries.filter(x => x.timestamp >= oneHourAgo);
+                const balanceChangeHourly = lastHourlyntries.length > 0 ? parseFloat(lastHourlyntries[lastHourlyntries.length - 1].balance - lastHourlyntries[0].balance) : 0;
+
+                //Minute
+                const lastMinuteEntries = lastHourlyntries.filter(x => x.timestamp >= oneMinuteAgo);
+                const balanceChangeMinute = lastMinuteEntries.length > 0 ? parseFloat(lastMinuteEntries[lastMinuteEntries.length - 1].balance - lastMinuteEntries[0].balance) : 0;
 
                 if (!summary[peerId]) {
                     summary[peerId] = {
@@ -59,16 +62,19 @@ export default async function handler(req, res) {
                 let twelveHoursAgo = new Date(lastTimestamp.getTime() - 12 * 60 * 60 * 1000);
                 twelveHoursAgo.setMinutes(0, 0, 0);
 
-                for (var i = 1; i <= 12; i++) {
-                    const Hourlater = new Date(twelveHoursAgo.getTime() + 3600000);
-                    const hourlyEntries = allEntries.filter(x => x.timestamp >= twelveHoursAgo && x.timestamp <= (Hourlater));
-                    const hourlyChange = hourlyEntries.length > 0 ? parseFloat(hourlyEntries[hourlyEntries.length - 1].balance - hourlyEntries[0].balance) : 0;
+                for (let i = 0; i < 12; i++) { // Change to start from 0 to 11 for 12 iterations
+                    const hourAgo = new Date(twelveHoursAgo.getTime() + i * 3600000); // Calculate the time for each hour
+                    const hourlyEntries = lastDayEntries.filter(x => x.timestamp >= hourAgo && x.timestamp < hourAgo.getTime() + 3600000);
+                    
+                    const hourlyChange = hourlyEntries.length > 0 
+                        ? parseFloat(hourlyEntries[hourlyEntries.length - 1].balance - hourlyEntries[0].balance) 
+                        : 0;
+                
                     hourlyData.push({
-                        timestamp: twelveHoursAgo,
+                        timestamp: hourAgo,
                         value: hourlyChange
                     });
-                    twelveHoursAgo = new Date(twelveHoursAgo.getTime() + 3600000);
-                }
+                }                
 
                 summary[peerId].hourly = hourlyData
             });

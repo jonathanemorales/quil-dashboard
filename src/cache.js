@@ -84,8 +84,8 @@ export async function addData(data) {
     }
 }
 
-// Start the periodic cache flush every 5 seconds
-setInterval(flushCacheToFile, 5000);
+// Start the periodic cache flush every 60 seconds
+setInterval(flushCacheToFile, 60000);
 
 // Load the miners data into the cache when the module is imported
 loadMinersData();
