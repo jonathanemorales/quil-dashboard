@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
                 const lastTimestamp = new Date(allEntries[allEntries.length - 1].timestamp);
                 let twelveHoursAgo = new Date(lastTimestamp.getTime() - 12 * 60 * 60 * 1000);
-                twelveHoursAgo.setHours(0, 0, 0, 0);
+                twelveHoursAgo.setMinutes(0, 0, 0);
 
                 for (var i = 1; i <= 12; i++) {
                     const Hourlater = new Date(twelveHoursAgo.getTime() + 3600000);
