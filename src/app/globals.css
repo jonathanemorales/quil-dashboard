@@ -61,8 +61,6 @@ body {
 /* Table Styling */
 .table {
   width: 100%;
-  /* Make the table take up the full width of the container */
-  max-width: 1200px;
   /* Limit table width */
   border-collapse: collapse;
   font-size: 1.1rem;
