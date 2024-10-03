@@ -46,14 +46,14 @@ export default function Home() {
     fetchData();
 
     // Set intervals for recurring fetches
-    const dataInterval = setInterval(fetchData, 5000); // Fetch every 5 seconds
-    const priceInterval = setInterval(fetchPrice, 60000); // Fetch every 60 seconds
+    // const dataInterval = setInterval(fetchData, 5000); // Fetch every 5 seconds
+    // const priceInterval = setInterval(fetchPrice, 60000); // Fetch every 60 seconds
 
-    // Clean up intervals when the component unmounts
-    return () => {
-      clearInterval(dataInterval);
-      clearInterval(priceInterval);
-    };
+    // // Clean up intervals when the component unmounts
+    // return () => {
+    //   clearInterval(dataInterval);
+    //   clearInterval(priceInterval);
+    // };
   }, []); // Empty dependency array means it runs only once after the component mounts
 
   const handleLabelUpdate = useCallback((event) => {
