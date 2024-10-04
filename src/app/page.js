@@ -18,22 +18,14 @@ export default function Home() {
       try {
         const response = await fetch("/api/data"); // Fetch data from your API endpoint
         const data = await response.json(); // Parse the JSON data
-
-        // Convert the data object to an array of values or entries
-        const dataArray = Object.values(data); // or Object.entries(data) if you need both key and value
-
-        // Now you can sort the array
-        dataArray.sort((a, b) => b.earningsPastMinute - a.earningsPastMinute);
-
-        // Set the sorted data into state
-        setMinerData(dataArray); // Use dataArray since it's now sorted
-
-        // Set chart data based on sorted data
-        setChartData(mapDataForChart(dataArray));
+        data.sort((a,b) => b.earningsPastMinute - a.earningsPastMinute)
+        setMinerData(data); // Set the data to the state
+        setChartData(mapDataForChart(data));
       } catch (error) {
         console.error("Error fetching miner data:", error); // Handle any errors
       }
     };
+
     const fetchPrice = async () => {
       const url = "https://api.coingecko.com/api/v3/simple/price";
       const params = new URLSearchParams({
@@ -81,15 +73,15 @@ export default function Home() {
   useEffect(() => {
     // Load labels from localStorage when the component is mounted
     minersData.forEach((miner) => {
-      const storedLabel = localStorage.getItem(miner[0]);
-      const minerElement = document.querySelector(`[data-peer-id="${miner[0]}"]`);
+      const storedLabel = localStorage.getItem(miner.peerId);
+      const minerElement = document.querySelector(`[data-peer-id="${miner.peerId}"]`);
       if (minerElement) {
         const labelSpan = minerElement.querySelector('.label');
 
         if (storedLabel) {
           labelSpan.textContent = `${storedLabel}`;
         } else {
-          labelSpan.textContent = `${miner[0]}`;
+          labelSpan.textContent = `${miner.peerId}`;
         }
       }
     });
@@ -110,10 +102,10 @@ export default function Home() {
 
   // Mapping function to transform the data
   const mapDataForChart = (data) => {
-    if (data && data.length > 0) {
+    if (data && data.length >0) {
       return data.map(entry => ({
-        user: entry[0],  // If `timestamp` is null or undefined, set to null
-        values: entry[1].hourly,  // If `value` is null or undefined, set to 0 or any default value you prefer
+        user: entry.peerId,  // If `timestamp` is null or undefined, set to null
+        values: entry.hourly,  // If `value` is null or undefined, set to 0 or any default value you prefer
       }));
     }
     return [];
@@ -140,27 +132,27 @@ export default function Home() {
           <tbody>
             {minersData?.map((miner, index) => (
               <tr key={index}>
-                <td className="miner-name" data-peer-id={miner[0]}>
+                <td className="miner-name" data-peer-id={miner?.peerId}>
                   <span className="label"></span>
                 </td>
-                <td>{miner[1]?.earningsPastMinute?.toFixed(4)}</td>
-                <td>{miner[1]?.earningsPastHour?.toFixed(4)}</td>
-                <td>{miner[1]?.earningsPastDay?.toFixed(4)}</td>
-                <td>${(miner[1]?.earningsPastMinute * currentQuilPrice).toFixed(2)}</td>
-                <td>${(miner[1]?.earningsPastHour * currentQuilPrice).toFixed(2)}</td>
-                <td>${(miner[1]?.earningsPastDay * currentQuilPrice).toFixed(2)}</td>
-                <th>{miner[1]?.lastBalance?.toFixed(0)}</th>
+                <td>{miner?.earningsPastMinute?.toFixed(4)}</td>
+                <td>{miner?.earningsPastHour?.toFixed(4)}</td>
+                <td>{miner?.earningsPastDay?.toFixed(4)}</td>
+                <td>${(miner?.earningsPastMinute * currentQuilPrice).toFixed(2)}</td>
+                <td>${(miner?.earningsPastHour * currentQuilPrice).toFixed(2)}</td>
+                <td>${(miner?.earningsPastDay * currentQuilPrice).toFixed(2)}</td>
+                <th>{miner?.lastBalance?.toFixed(0)}</th>
               </tr>
             ))}
             <tr>
               <td><strong>Totals</strong></td>
-              <td>{minersData?.reduce((acc, miner) => acc + miner[1].earningsPastMinute, 0).toFixed(4)}</td>
-              <td>{minersData?.reduce((acc, miner) => acc + miner[1].earningsPastHour, 0).toFixed(4)}</td>
-              <td>{minersData?.reduce((acc, miner) => acc + miner[1].earningsPastDay, 0).toFixed(4)}</td>
-              <td>${minersData?.reduce((acc, miner) => acc + (miner[1].earningsPastMinute * currentQuilPrice), 0).toFixed(2)}</td>
-              <td>${minersData?.reduce((acc, miner) => acc + (miner[1].earningsPastHour * currentQuilPrice), 0).toFixed(2)}</td>
-              <td>${minersData?.reduce((acc, miner) => acc + (miner[1].earningsPastDay * currentQuilPrice), 0).toFixed(2)}</td>
-              <td>{minersData?.reduce((acc, miner) => acc + miner[1].lastBalance, 0).toFixed(0)}</td>
+              <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastMinute, 0).toFixed(4)}</td>
+              <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastHour, 0).toFixed(4)}</td>
+              <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastDay, 0).toFixed(4)}</td>
+              <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastMinute * currentQuilPrice), 0).toFixed(2)}</td>
+              <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastHour * currentQuilPrice), 0).toFixed(2)}</td>
+              <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastDay * currentQuilPrice), 0).toFixed(2)}</td>
+              <td>{minersData?.reduce((acc, miner) => acc + miner.lastBalance, 0).toFixed(0)}</td>
             </tr>
           </tbody>
         </table>

@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             const oneDayAgo = new Date(now - 86400000);
 
             // Initialize an object to store summarized data for each peer_id
-            const summary = {};
+            const summary = [];
 
             const uniquePeerIds = [...new Set(minersData.map(item => item.peer_id))];
 
@@ -49,15 +49,6 @@ export default async function handler(req, res) {
                 const lastMinuteEntries = lastHourlyntries.filter(x => x.timestamp >= oneMinuteAgo);
                 const balanceChangeMinute = lastMinuteEntries.length > 0 ? parseFloat(lastMinuteEntries[lastMinuteEntries.length - 1].balance - lastMinuteEntries[0].balance) : 0;
 
-                if (!summary[peerId]) {
-                    summary[peerId] = {
-                        earningsPastMinute: balanceChangeMinute,
-                        earningsPastHour: balanceChangeHourly,
-                        earningsPastDay: balanceChangeDaily,
-                        lastBalance: allEntries?.length > 0 ? parseFloat(allEntries[allEntries.length - 1].balance) : 0, // Store the last balance to calculate differences
-                    };
-                }
-
                 const lastTimestamp = new Date(allEntries[allEntries.length - 1].timestamp);
                 let twelveHoursAgo = new Date(lastTimestamp.getTime() - 12 * 60 * 60 * 1000);
                 twelveHoursAgo.setMinutes(0, 0, 0);
@@ -74,9 +65,16 @@ export default async function handler(req, res) {
                         timestamp: hourAgo,
                         value: hourlyChange
                     });
-                }                
-
-                summary[peerId].hourly = hourlyData
+                }
+                
+                summary.push({
+                    peerId: peerId,
+                    hourly: hourlyData,
+                    earningsPastMinute: balanceChangeMinute,
+                    earningsPastHour: balanceChangeHourly,
+                    earningsPastDay: balanceChangeDaily,
+                    lastBalance: allEntries?.length > 0 ? parseFloat(allEntries[allEntries.length - 1].balance) : 0, // Store the last balance to calculate differences
+                })
             });
 
             // Return the summarized data for all peer_ids
