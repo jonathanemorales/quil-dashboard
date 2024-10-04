@@ -20,6 +20,7 @@ export async function loadMinersData() {
         const data = await fs.readFile(filePath, 'utf-8');
         minersDataCache = JSON.parse(data);
         console.log('Miners data loaded into cache');
+        setInterval(flushCacheToFile, 10000);
     } catch (error) {
         console.error('Error loading miners data:', error);
         minersDataCache = []; // Initialize an empty cache if file read fails
@@ -83,9 +84,6 @@ export async function addData(data) {
         isCacheLocked = false;
     }
 }
-
-// Start the periodic cache flush every 60 seconds
-setInterval(flushCacheToFile, 60000);
 
 // Load the miners data into the cache when the module is imported
 loadMinersData();
