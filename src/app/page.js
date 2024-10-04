@@ -18,14 +18,22 @@ export default function Home() {
       try {
         const response = await fetch("/api/data"); // Fetch data from your API endpoint
         const data = await response.json(); // Parse the JSON data
-        data.sort((a, b) => b.earningsPastMinute - a.earningsPastMinute);
-        setMinerData(Object.entries(data)); // Set the data to the state
-        setChartData(mapDataForChart(data));
+
+        // Convert the data object to an array of values or entries
+        const dataArray = Object.values(data); // or Object.entries(data) if you need both key and value
+
+        // Now you can sort the array
+        dataArray.sort((a, b) => b.earningsPastMinute - a.earningsPastMinute);
+
+        // Set the sorted data into state
+        setMinerData(dataArray); // Use dataArray since it's now sorted
+
+        // Set chart data based on sorted data
+        setChartData(mapDataForChart(dataArray));
       } catch (error) {
         console.error("Error fetching miner data:", error); // Handle any errors
       }
     };
-
     const fetchPrice = async () => {
       const url = "https://api.coingecko.com/api/v3/simple/price";
       const params = new URLSearchParams({
@@ -102,7 +110,7 @@ export default function Home() {
 
   // Mapping function to transform the data
   const mapDataForChart = (data) => {
-    if (data && data.length >0) {
+    if (data && data.length > 0) {
       return data.map(entry => ({
         user: entry[0],  // If `timestamp` is null or undefined, set to null
         values: entry[1].hourly,  // If `value` is null or undefined, set to 0 or any default value you prefer
