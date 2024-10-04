@@ -9,6 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     var data = mapDataForChart(minersData);
+    data.sort((a, b) => b.earningsPastMinute - a.earningsPastMinute);
     setChartData(data);
   }, [minersData]);
 
@@ -18,6 +19,7 @@ export default function Home() {
       try {
         const response = await fetch("/api/data"); // Fetch data from your API endpoint
         const data = await response.json(); // Parse the JSON data
+
         setMinerData(Object.entries(data)); // Set the data to the state
         setChartData(mapDataForChart(data));
       } catch (error) {
