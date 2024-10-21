@@ -50,10 +50,10 @@ export default async function handler(req, res) {
                 const balanceChangeMinute = lastMinuteEntries.length > 0 ? parseFloat(lastMinuteEntries[lastMinuteEntries.length - 1].balance - lastMinuteEntries[0].balance) : 0;
 
                 const lastTimestamp = new Date(allEntries[allEntries.length - 1].timestamp);
-                let twelveHoursAgo = new Date(lastTimestamp.getTime() - 12 * 60 * 60 * 1000);
+                let twelveHoursAgo = new Date(lastTimestamp.getTime() - 24 * 60 * 60 * 1000);
                 twelveHoursAgo.setMinutes(0, 0, 0);
 
-                for (let i = 0; i < 12; i++) { // Change to start from 0 to 11 for 12 iterations
+                for (let i = 0; i < 24; i++) { // Change to start from 0 to 11 for 12 iterations
                     const hourAgo = new Date(twelveHoursAgo.getTime() + i * 3600000); // Calculate the time for each hour
                     const hourlyEntries = lastDayEntries.filter(x => x.timestamp >= hourAgo && x.timestamp < hourAgo.getTime() + 3600000);
                     
