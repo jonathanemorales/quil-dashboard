@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
         try {
-            if(req.body.balance){
+            if (req.body.balance && req.body.peer_id) {
                 addData(req.body);
             }
             return res.status(200).json({ message: 'Data saved successfully' });
