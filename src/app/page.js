@@ -126,6 +126,7 @@ export default function Home() {
               <th>USD/Minute</th>
               <th>USD/Hour</th>
               <th>USD/Day</th>
+              <th>USD/Month</th>
               <th>Total QUIL</th>
             </tr>
           </thead>
@@ -141,6 +142,7 @@ export default function Home() {
                 <td>${(miner?.earningsPastMinute * currentQuilPrice).toFixed(2)}</td>
                 <td>${(miner?.earningsPastHour * currentQuilPrice).toFixed(2)}</td>
                 <td>${(miner?.earningsPastDay * currentQuilPrice).toFixed(2)}</td>
+                <td>${(miner?.earningsPastMonth * currentQuilPrice).toFixed(2)}</td>
                 <th>{miner?.lastBalance?.toFixed(0)}</th>
               </tr>
             ))}
@@ -152,6 +154,7 @@ export default function Home() {
               <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastMinute * currentQuilPrice), 0).toFixed(2)}</td>
               <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastHour * currentQuilPrice), 0).toFixed(2)}</td>
               <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastDay * currentQuilPrice), 0).toFixed(2)}</td>
+              <td>${minersData?.reduce((acc, miner) => acc + (miner.earningsPastMonth * currentQuilPrice), 0).toFixed(2)}</td>
               <td>{minersData?.reduce((acc, miner) => acc + miner.lastBalance, 0).toFixed(0)}</td>
             </tr>
           </tbody>

@@ -26,6 +26,7 @@ export default async function handler(req, res) {
             const oneMinuteAgo = new Date(now - 60000);
             const oneHourAgo = new Date(now - 3600000);
             const oneDayAgo = new Date(now - 86400000);
+            const oneMonthAgo = new Date(now - (86400000 * 30));
 
             // Initialize an object to store summarized data for each peer_id
             const summary = [];
@@ -38,7 +39,11 @@ export default async function handler(req, res) {
                 const hourlyData = []
 
                 //Daily
-                const lastDayEntries = allEntries.filter(x => x.timestamp >= oneDayAgo);
+                const lastMonthEntries = allEntries.filter(x => x.timestamp >= oneMonthAgo);
+                const balanceChangeMonthly = lastMonthEntries.length > 0 ? parseFloat(lastMonthEntries[lastMonthEntries.length - 1].balance - lastMonthEntries[0].balance) : 0;
+
+                //Daily
+                const lastDayEntries = lastMonthEntries.filter(x => x.timestamp >= oneDayAgo);
                 const balanceChangeDaily = lastDayEntries.length > 0 ? parseFloat(lastDayEntries[lastDayEntries.length - 1].balance - lastDayEntries[0].balance) : 0;
 
                 //Minute
@@ -56,23 +61,24 @@ export default async function handler(req, res) {
                 for (let i = 0; i < 24; i++) { // Change to start from 0 to 11 for 12 iterations
                     const hourAgo = new Date(twelveHoursAgo.getTime() + i * 3600000); // Calculate the time for each hour
                     const hourlyEntries = lastDayEntries.filter(x => x.timestamp >= hourAgo && x.timestamp < hourAgo.getTime() + 3600000);
-                    
-                    const hourlyChange = hourlyEntries.length > 0 
-                        ? parseFloat(hourlyEntries[hourlyEntries.length - 1].balance - hourlyEntries[0].balance) 
+
+                    const hourlyChange = hourlyEntries.length > 0
+                        ? parseFloat(hourlyEntries[hourlyEntries.length - 1].balance - hourlyEntries[0].balance)
                         : 0;
-                
+
                     hourlyData.push({
                         timestamp: hourAgo,
                         value: hourlyChange
                     });
                 }
-                
+
                 summary.push({
                     peerId: peerId,
                     hourly: hourlyData,
                     earningsPastMinute: balanceChangeMinute,
                     earningsPastHour: balanceChangeHourly,
                     earningsPastDay: balanceChangeDaily,
+                    earningsPastMonth: balanceChangeMonthly,
                     lastBalance: allEntries?.length > 0 ? parseFloat(allEntries[allEntries.length - 1].balance) : 0, // Store the last balance to calculate differences
                 })
             });
