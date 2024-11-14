@@ -120,6 +120,7 @@ export default function Home() {
           <thead>
             <tr>
               <th>Miner</th>
+              <th>Ring</th>
               <th>QUIL/Minute</th>
               <th>QUIL/Hour</th>
               <th>QUIL/Day</th>
@@ -136,6 +137,7 @@ export default function Home() {
                 <td className="miner-name" data-peer-id={miner?.peerId}>
                   <span className="label"></span>
                 </td>
+                <td>{miner?.ring}</td>
                 <td>{miner?.earningsPastMinute?.toFixed(4)}</td>
                 <td>{miner?.earningsPastHour?.toFixed(4)}</td>
                 <td>{miner?.earningsPastDay?.toFixed(4)}</td>
@@ -148,6 +150,7 @@ export default function Home() {
             ))}
             <tr>
               <td><strong>Totals</strong></td>
+              <td></td>
               <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastMinute, 0).toFixed(4)}</td>
               <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastHour, 0).toFixed(4)}</td>
               <td>{minersData?.reduce((acc, miner) => acc + miner.earningsPastDay, 0).toFixed(4)}</td>

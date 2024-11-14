@@ -74,6 +74,7 @@ export default async function handler(req, res) {
 
                 summary.push({
                     peerId: peerId,
+                    ring: allEntries[allEntries.length - 1].prover_ring,
                     hourly: hourlyData,
                     earningsPastMinute: balanceChangeMinute,
                     earningsPastHour: balanceChangeHourly,

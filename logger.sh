@@ -1,23 +1,25 @@
 #!/bin/bash
 
 # Navigate to the correct directory
-cd ./ceremonyclient/node || exit 1  # Exit if directory change fails
+cd ~/ceremonyclient/node || exit 1  # Exit if directory change fails
 
 PREVIOUS_BALANCE=""
 
 while true; do
-  #git pull
+  # Run the command once and store the output
+  NODE_INFO_OUTPUT=$(./node-2.0.3.4-linux-amd64 --node-info)
 
-  # Fetch peer ID and balance
-  PEER_ID=$(./node-1.4.21.1-linux-amd64 -peer-id | grep "Peer ID" | awk '{print $3}')
-  CURRENT_BALANCE=$(./node-1.4.21.1-linux-amd64 -balance | grep "Unclaimed balance" | awk '{print $3}')
+  # Extract Peer ID, Prover Ring, and Owned Balance from the output
+  PEER_ID=$(echo "$NODE_INFO_OUTPUT" | grep "Peer ID" | awk '{print $3}')
+  PROVER_RING=$(echo "$NODE_INFO_OUTPUT" | grep "Prover Ring" | awk '{print $3}')
+  CURRENT_BALANCE=$(echo "$NODE_INFO_OUTPUT" | grep "Owned balance" | awk '{print $3}')
   DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
   # Check if the balance has changed
   if [ "$CURRENT_BALANCE" != "$PREVIOUS_BALANCE" ]; then
     # Send the data to the API endpoint
     curl -X POST -H "Content-Type: application/json" \
-    -d "{\"peer_id\":\"$PEER_ID\", \"balance\":\"$CURRENT_BALANCE\", \"timestamp\":\"$DATE\"}" \
+    -d "{\"peer_id\":\"$PEER_ID\", \"prover_ring\":\"$PROVER_RING\", \"balance\":\"$CURRENT_BALANCE\", \"timestamp\":\"$DATE\"}" \
     http://127.0.0.1:3000/api/miner
     
     # Update the previous balance
